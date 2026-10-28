@@ -2,6 +2,13 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) · Versões: [SemVer](https://semver.org/lang/pt-BR/).
 
+## [0.4.0] - 2026-10-28
+
+### Adicionado
+- Vendor: `impeccable@d34c87e1a009` (pack `design`), `taste-skill@12af471f627f` (pack `taste`), `google-maps-scraper-kit@656d66daa269` (fora dos packs, com aviso legal).
+- `scripts/leis.sh` + `docs/leis-brasil.md`: leis do Brasil (ctresb/leis) por sparse checkout.
+- `docs/leads-google-maps.md` (Termos do Google, LGPD, telemetria) e `docs/higgsfield.md` (serviço pago).
+
 ## [0.3.0] - 2026-10-28
 
 ### Adicionado
