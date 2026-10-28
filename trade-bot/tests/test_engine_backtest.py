@@ -59,6 +59,14 @@ class TestEngine(unittest.TestCase):
         e.tick(self.at(9, 55))
         self.assertEqual(len(self.b.orders), 1)
 
+    def test_req12_slippage_capped_by_risk(self):
+        e = self.eng(FakeData(history_plus_today(flat_then_breakout(TODAY))), max_slippage_pct=5.0)
+        e.tick(self.at(9, 50))
+        o = self.b.orders[0]
+        # entrada 101, stop 100 -> risco 1.00 -> tolerância máx 0.20 (e não 5% = 5.05)
+        self.assertEqual(o["limit_price"], "101.20")
+        self.assertEqual(o["take_profit"]["limit_price"], "102.40")
+
     def test_req05_timemachine_blocks_without_edge(self):
         e = self.eng(FakeData(history_plus_today(flat_then_breakout(TODAY), drift=-0.0015)))
         e.tick(self.at(9, 50))

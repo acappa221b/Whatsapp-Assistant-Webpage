@@ -91,7 +91,9 @@ class Engine:
                 if not ok:
                     continue
 
-            limit = round(sig["entry"] * (1 + cfg.get("max_slippage_pct", 0.1) / 100.0), 2)
+            # tolerância de preço: % do preço, mas nunca mais que 20% do risco (REQ-12)
+            slip = min(sig["entry"] * cfg.get("max_slippage_pct", 0.1) / 100.0, 0.2 * (sig["entry"] - sig["stop"]))
+            limit = round(sig["entry"] + slip, 2)
             # alvo recalculado a partir do preço limite para manter o R:R configurado
             target = round(limit + cfg.get("target_r", 1.0) * (limit - sig["stop"]), 2)
             qty = sizing.position_size(limit, sig["stop"], buying_power, cfg)

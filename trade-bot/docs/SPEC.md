@@ -1,4 +1,4 @@
-# SPEC — trade-bot v0.1.0
+# SPEC — trade-bot v0.1.1
 
 Status: **Aprovada para implementação** · Dono: Alexandre Cappa · Última revisão: 2026-10-28
 
@@ -30,6 +30,7 @@ Nenhum código foi copiado: a implementação é própria.
 | REQ-08 | Toda entrada é uma ordem **bracket** (entrada limite + stop-loss + take-profit) com `client_order_id` único e determinístico (idempotente). | `test_broker` |
 | REQ-09 | Zerar tudo (cancelar ordens e fechar posições) a partir de `flat_by`, ao atingir o limite de perda diária ou com o kill switch. | `test_engine` |
 | REQ-10 | Toda decisão (sinal, bloqueio, ordem, erro) é gravada em `state/journal-AAAA-MM-DD.jsonl`. | `test_engine` |
+| REQ-12 | O preço limite da entrada = sinal + tolerância, onde a tolerância é `max_slippage_pct` do preço, **limitada a 20% do risco**. O alvo é recalculado a partir do limite para manter o R:R. | `test_engine_backtest` |
 | REQ-11 | Backtest walk-forward da mesma regra (com e sem o filtro da Máquina do Tempo), mostrando nº de trades, taxa de acerto, R médio, R total e drawdown máximo em R. | `test_backtest` |
 
 ## 4. Requisitos de segurança (obrigatórios)

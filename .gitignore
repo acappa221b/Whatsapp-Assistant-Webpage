@@ -6,3 +6,4 @@ trade-bot/state/
 state/
 node_modules/
 *.mp4
+trade-bot/demo/video/.demo.json

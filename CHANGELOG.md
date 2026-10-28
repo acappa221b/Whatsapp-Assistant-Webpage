@@ -2,6 +2,15 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) · Versões: [SemVer](https://semver.org/lang/pt-BR/).
 
+## [0.3.0] - 2026-10-28
+
+### Adicionado
+- `trade-bot` v0.1.1: demonstração offline `trade-bot/demo/replay.py` (pregão sintético com 3 ativos).
+- Vídeo explicativo gerado com HyperFrames (`trade-bot/demo/video/build.py`) e prints em `docs/demo/`.
+
+### Corrigido
+- `trade-bot`: a tolerância de preço da entrada podia superar o próprio risco da operação; agora é limitada a 20% do risco (REQ-12).
+
 ## [0.2.0] - 2026-10-28
 
 ### Adicionado
