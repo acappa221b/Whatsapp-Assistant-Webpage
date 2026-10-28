@@ -23,6 +23,18 @@ No Claude Code, peça por exemplo:
 
 Combine com `./scripts/use-design.sh <marca> meu-video` para herdar uma paleta pronta.
 
+## Vídeo de lançamento do seu projeto: `/brag`
+
+Com o pack `brag` instalado, dentro da pasta de um projeto seu (site ou app), peça no Claude Code:
+
+```
+/brag --tone polished --format vertical
+```
+
+Ele lê o código, planeja o roteiro, monta a animação com o HyperFrames e
+renderiza `brag.mp4` com trilha, efeitos e texto para postar. Ao publicar com a
+trilha padrão, credite: "Music: Sascha Ende, ende.app (CC BY 4.0)".
+
 ## Galerias de prompts (só links: o conteúdo é dos criadores)
 
 Não encontramos licença aberta para essas coleções, por isso os prompts **não

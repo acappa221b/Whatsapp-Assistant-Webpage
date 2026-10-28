@@ -2,6 +2,14 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) · Versões: [SemVer](https://semver.org/lang/pt-BR/).
 
+## [0.2.0] - 2026-10-28
+
+### Adicionado
+- Vendor: `brag@669ab9286aa2` (skill `/brag`, vídeo de lançamento do projeto via HyperFrames), no pack `brag` do `install-skills.sh`.
+
+### Alterado
+- Harness: versão do toolkit (`VERSION`) desacoplada da versão do `trade-bot` (que segue em `trade-bot` v0.1.0).
+
 ## [0.1.0] - 2026-10-28
 
 ### Adicionado

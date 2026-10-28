@@ -6,8 +6,9 @@ cd "$ROOT"
 
 echo "== 1/5 versão consistente"
 V="$(cat VERSION)"
-grep -q "__version__ = \"$V\"" trade-bot/tradebot/__init__.py || { echo "VERSION ($V) != tradebot.__version__"; exit 1; }
 grep -q "## \[$V\]" CHANGELOG.md || { echo "CHANGELOG sem a seção [$V]"; exit 1; }
+TB="$(python3 -c 'import sys; sys.path.insert(0, "trade-bot"); import tradebot; print(tradebot.__version__)')"
+grep -q "trade-bot\` v$TB" CHANGELOG.md || { echo "CHANGELOG não menciona trade-bot v$TB"; exit 1; }
 
 echo "== 2/5 compilação"
 python3 -m compileall -q trade-bot/tradebot trade-bot/tests

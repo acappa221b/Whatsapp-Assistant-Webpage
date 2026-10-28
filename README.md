@@ -8,6 +8,7 @@ Development, versionamento SemVer e um harness de testes que libera cada mudanç
 | [`trade-bot/`](trade-bot/) | Robô de day trade automático (ações EUA via Alpaca): rompimento da faixa de abertura + Máquina do Tempo (Monte Carlo) + limites de risco | Código próprio, inspirado em `Jakeschincariol/day-trader-skill` (MIT) |
 | [`vendor/marketingskills/`](vendor/marketingskills/) | 52 skills de marketing: CRO, copy, SEO, anúncios, cold e-mail, preços, lançamento… | coreyhaines31/marketingskills (MIT) |
 | [`vendor/hyperframes/`](vendor/hyperframes/) | Skills do HyperFrames: o Claude escreve HTML e renderiza em vídeo MP4 | heygen-com/hyperframes (Apache-2.0) |
+| [`vendor/brag/`](vendor/brag/) | `/brag`: transforma o site/app do projeto num vídeo de lançamento de 15-25 s (usa o HyperFrames) | latent-spaces/brag (MIT) |
 | [`vendor/awesome-design-md/`](vendor/awesome-design-md/) | 84 design systems (`DESIGN.md`) inspirados em marcas reais | VoltAgent/awesome-design-md (MIT) |
 | [`docs/motion-graphics.md`](docs/motion-graphics.md) | Como fazer motion graphics com o Claude + galerias de prompts | Links (sem cópia de conteúdo) |
 
@@ -17,7 +18,7 @@ Development, versionamento SemVer e um harness de testes que libera cada mudanç
 # 1. Garantir que está tudo verde
 ./scripts/harness.sh
 
-# 2. Instalar as skills de marketing e vídeo no Claude Code
+# 2. Instalar as skills de marketing, vídeo e brag no Claude Code
 ./scripts/install-skills.sh                 # global (~/.claude/skills)
 ./scripts/install-skills.sh ../meu-projeto  # só num projeto
 
