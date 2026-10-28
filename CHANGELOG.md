@@ -1,0 +1,12 @@
+# Changelog
+
+Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) · Versões: [SemVer](https://semver.org/lang/pt-BR/).
+
+## [0.1.0] - 2026-10-28
+
+### Adicionado
+- `trade-bot` v0.1.0: robô ORB + Máquina do Tempo + regras de risco para a Alpaca (modos `sim`, `paper` e `live`), CLI, backtest walk-forward e 49 testes offline. SPEC em `trade-bot/docs/SPEC.md`.
+- Vendor: `marketingskills@0cd9b3a0ef4c`, `hyperframes/skills@439d6856780f`, `awesome-design-md@3b605329240c`.
+- Scripts: `harness.sh`, `install-skills.sh`, `use-design.sh`, `update-vendor.sh`.
+- CI no GitHub Actions rodando o harness em Python 3.10, 3.12 e 3.13.
+- Guia `docs/motion-graphics.md`.

@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.env
+trade-bot/config.json
+trade-bot/state/
+state/
+node_modules/
+*.mp4

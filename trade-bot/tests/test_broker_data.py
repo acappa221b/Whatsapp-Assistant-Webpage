@@ -1,0 +1,114 @@
+import json
+import unittest
+
+from helpers import cfg  # noqa: F401  (ajusta sys.path)
+from tradebot import broker, data
+
+LIVE_ENV = {"TRADEBOT_LIVE_CONFIRM": broker.LIVE_CONFIRM_PHRASE,
+            "ALPACA_LIVE_KEY_ID": "LK", "ALPACA_LIVE_SECRET_KEY": "LS"}
+
+
+class TestCredentials(unittest.TestCase):
+    def test_sec01_default_is_paper(self):
+        mode, url, *_ = broker.resolve_credentials({}, {"ALPACA_PAPER_KEY_ID": "k", "ALPACA_PAPER_SECRET_KEY": "s"})
+        self.assertEqual((mode, url), ("paper", broker.PAPER_URL))
+
+    def test_sec02_live_requires_all_three(self):
+        self.assertEqual(broker.resolve_credentials({"mode": "live"}, LIVE_ENV)[:2], ("live", broker.LIVE_URL))
+        for drop in LIVE_ENV:
+            env = {k: v for k, v in LIVE_ENV.items() if k != drop}
+            with self.assertRaises(broker.ConfigError):
+                broker.resolve_credentials({"mode": "live"}, env)
+        with self.assertRaises(broker.ConfigError):
+            broker.resolve_credentials({"mode": "live"}, dict(LIVE_ENV, TRADEBOT_LIVE_CONFIRM="yes"))
+
+    def test_sec02_paper_keys_never_used_for_live(self):
+        env = {"TRADEBOT_LIVE_CONFIRM": broker.LIVE_CONFIRM_PHRASE,
+               "ALPACA_PAPER_KEY_ID": "k", "ALPACA_PAPER_SECRET_KEY": "s"}
+        with self.assertRaises(broker.ConfigError):
+            broker.resolve_credentials({"mode": "live"}, env)
+
+    def test_invalid_mode(self):
+        with self.assertRaises(broker.ConfigError):
+            broker.resolve_credentials({"mode": "yolo"}, {})
+
+
+class TestAlpaca(unittest.TestCase):
+    def setUp(self):
+        self.calls = []
+
+        def send(method, url, headers, body):
+            self.calls.append((method, url, headers, body))
+            if url.endswith("/v2/account"):
+                return 200, {"equity": "1000"}
+            if method == "POST":
+                return 200, {"id": "abc"}
+            return 403, {"message": "forbidden"}
+        self.a = broker.Alpaca(broker.PAPER_URL, "KEY", "SECRET", send=send)
+
+    def test_req08_bracket_payload(self):
+        self.a.submit_bracket("TSLA", 8, 364.55, 358.32, 370.04, "tb-1")
+        method, url, headers, body = self.calls[-1]
+        self.assertEqual((method, url), ("POST", broker.PAPER_URL + "/v2/orders"))
+        self.assertEqual(body["order_class"], "bracket")
+        self.assertEqual(body["qty"], "8")
+        self.assertEqual(body["limit_price"], "364.55")
+        self.assertEqual(body["stop_loss"], {"stop_price": "358.32"})
+        self.assertEqual(body["take_profit"], {"limit_price": "370.04"})
+        self.assertEqual(body["client_order_id"], "tb-1")
+
+    def test_req08_client_order_id_deterministic(self):
+        a = broker.client_order_id("2026-10-19", "TSLA", 9)
+        self.assertEqual(a, broker.client_order_id("2026-10-19", "TSLA", 9))
+        self.assertNotEqual(a, broker.client_order_id("2026-10-19", "TSLA", 10))
+
+    def test_http_error_raises(self):
+        with self.assertRaises(broker.BrokerError):
+            self.a.positions()
+
+    def test_sec03_repr_hides_keys(self):
+        self.assertNotIn("SECRET", repr(self.a))
+        self.assertNotIn("KEY", repr(self.a))
+
+
+class TestData(unittest.TestCase):
+    def test_parse_yahoo_skips_nulls(self):
+        raw = json.dumps({"chart": {"result": [{"timestamp": [1, 2], "indicators": {"quote": [{
+            "open": [1, None], "high": [2, 3], "low": [0.5, 1], "close": [1.5, 2], "volume": [10, 20]}]}}]}})
+        bars = data.parse_yahoo(raw)
+        self.assertEqual(len(bars), 1)
+        self.assertEqual(bars[0]["c"], 1.5)
+
+    def test_parse_yahoo_error(self):
+        with self.assertRaises(data.DataError):
+            data.parse_yahoo('{"chart": {"result": null}}')
+
+    def test_alpaca_pagination_and_grouping(self):
+        pages = [
+            {"bars": [{"t": "2026-10-19T13:30:00Z", "o": 1, "h": 2, "l": 0.5, "c": 1.5, "v": 1}],
+             "next_page_token": "p2"},
+            {"bars": [{"t": "2026-10-19T13:35:00Z", "o": 1.5, "h": 2, "l": 1, "c": 1.8, "v": 1},
+                      {"t": "2026-10-19T21:00:00Z", "o": 1, "h": 1, "l": 1, "c": 1, "v": 1}],
+             "next_page_token": None},
+        ]
+        seen = []
+
+        def get(url, headers=None):
+            seen.append(url)
+            return json.dumps(pages[len(seen) - 1])
+        bars = data.fetch_alpaca("TSLA", "k", "s", get=get)
+        self.assertEqual(len(bars), 3)
+        self.assertIn("page_token=p2", seen[1])
+        days = data.group_sessions(bars, 5)
+        (d, s), = days.items()
+        self.assertEqual(d.isoformat(), "2026-10-19")
+        self.assertEqual(s[0]["c"], 1.5)           # 09:30 ET
+        self.assertEqual(s[1]["c"], 1.8)           # 09:35 ET; barra pós-mercado descartada
+        self.assertEqual(sum(b is not None for b in s), 2)
+
+    def test_datasource_falls_back_to_yahoo_without_keys(self):
+        self.assertEqual(data.DataSource({"data_source": "alpaca"}, {}).kind, "yahoo")
+
+
+if __name__ == "__main__":
+    unittest.main()
